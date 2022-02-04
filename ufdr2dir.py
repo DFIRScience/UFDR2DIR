@@ -48,7 +48,7 @@ def getZipReportXML(ufdr, OUTD):
         with io.TextIOWrapper(zip.open("report.xml"), encoding="utf-8") as f:
             #count = sum(1 for _ in f)
             logging.info("Creating original directory structure...")
-            for l in alive_it(f): # Run though each line... this is gonna be slow.
+            for l in alive_it(f): # Run though each line... is lxml faster?
                 if l.__contains__('<file fs'):
                     result = re.search('path="(.*?)" ', l) # This gets original path / FN
                     if result:
@@ -57,8 +57,9 @@ def getZipReportXML(ufdr, OUTD):
                         # Create the original file directory structure
                         makeDirStructure(ORIGF, OUTD)
                 elif l.__contains__('name="Local Path"'):
-                    result = re.search('CDATA\[(.*?)\]\]', l) # This gets original path / FN
+                    result = re.search('CDATA\[(.*?)\]\]', l) # This gets local path / FN
                     if result:
+                        # ZipFile changes / or \ based on platform
                         if platform.system() == "Windows": LOCALF = result.group(1)
                         else: LOCALF = result.group(1).replace("\\", "/")
                         logging.debug(f'Local: {LOCALF}')
@@ -71,7 +72,6 @@ def extractToDir(zip, LOCALP, ORIGP, OUTD):
         zip.extract(LOCALP, OUTPATH)
     except KeyError as e:
         logging.debug(e)
-
 
 # This might not be necessary if we can extract directly.                    
 def makeDirStructure(FP, OUTD): # FP is a string
