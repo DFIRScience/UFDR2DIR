@@ -31,3 +31,7 @@ Cellebrite apparently does some deleted data recovery. These files are currently
 ## Bug reports and suggestions
 
 Pull requests considered! Otherwise create an issue or message me on [Twitter](https://twitter.com/dfirscience) if you find any bugs or have some recommendations.
+
+## Thank you
+
+Thanks to [Josh Hickman](https://thebinaryhick.blog/) for the public data sets that this script was tested on.
