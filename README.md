@@ -6,7 +6,7 @@ A script to convert a Cellebrite UFDR to it's original file and directory struct
 
 Cellebrite Reader files (.ufdr) are processed mobile device images. They are compressed (zip) files that contain a ```report.xml``` file in the root, and files sorted into directories by category.
 
-The ufdr has the original suspect data, but does not keep the original file path structure. This means that tools such as [ALEAPP]() have [poor results](https://dfir.science/2022/02/How-to-extract-files-from-Cellebrite-Reader-UFDR-for-ALEAPPiLEAPP) over the package.
+The ufdr has the original suspect data, but does not keep the original file path structure. This means that tools such as [ALEAPP](https://github.com/abrignoni/ALEAPP) have [poor results](https://dfir.science/2022/02/How-to-extract-files-from-Cellebrite-Reader-UFDR-for-ALEAPPiLEAPP) over the package.
 
 UFDR2DIR converts the categorized data back into the original suspect directory structure. This will allow tools that do not support UFDR to load the data as a directory.
 
