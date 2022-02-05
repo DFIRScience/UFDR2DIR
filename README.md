@@ -28,9 +28,22 @@ The output directory will mirror what was recorded in ```report.xml```. You can 
 
 Cellebrite apparently does some deleted data recovery. These files are currently **not** being extracted if they lack path information.
 
+Most UFDR are probably going to be from Android and iOS. Windows, however, has a lot of illegal file path characters. If you extract the UFDR on Windows/NTFS, illegal characters will be stripped from the file path. Be aware that some paths may be slightly different from original on Windows.
+
+**Example:** ```com.facebook.katana:dash``` <-- ":" is an illegal path character in NTFS (thanks, alternate data streams!). As such, UFDR2DIR extracts it as ```com.facebook.katanadash``` on Windows. Linux and MacOS are unaffected. 
+
 ## Bug reports and suggestions
 
 Pull requests considered! Otherwise create an issue or message me on [Twitter](https://twitter.com/dfirscience) if you find any bugs or have some recommendations.
+
+### Testing
+
+Tested on:
+
+* Linux Mint 20.3
+* (light testing) Windows 11
+
+If you have issues or experience on other platforms, please let me know how it went.
 
 ## Thank you
 

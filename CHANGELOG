@@ -6,10 +6,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.3] - 2022-02-05
+### Changed
+- Strip illegal path chars in Windows
+
 ## [0.1.2] - 2022-02-05
 ### Changed
 - Changed zip file extraction bug in Windows
-- Temp remove specify output directory
+- Temp remove set output directory
 
 ## [0.1.1] - 2022-02-04
 ### Added

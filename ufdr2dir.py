@@ -21,7 +21,7 @@ __author__ = 'Joshua James'
 __copyright__ = 'Copyright 2022, UFDR2DIR'
 __credits__ = []
 __license__ = 'MIT'
-__version__ = '0.1.2'
+__version__ = '0.1.3'
 __maintainer__ = 'Joshua James'
 __email__ = 'joshua+github@dfirscience.org'
 __status__ = 'active'
@@ -52,6 +52,12 @@ def getZipReportXML(ufdr, OUTD):
                     result = re.search('path="(.*?)" ', l) # This gets original path / FN
                     if result:
                         ORIGF = result.group(1)
+                        if platform.system() is "Windows":
+                            illegal = ["<", ">", ":", "\"", "/", "\\", "|", "?", "*"]
+                            if any(x in ORIGF for x in illegal):
+                                logging.debug("Illegal character found in Windows file path... removing")
+                                # Strip unsupported chars
+                                ORIGF = result.group(1).strip("<>:\"/\|?*")
                         logging.debug(f'Original: {ORIGF}')
                         # Create the original file directory structure
                         makeDirStructure(ORIGF, OUTD)
