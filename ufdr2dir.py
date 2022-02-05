@@ -78,7 +78,7 @@ def extractToDir(zip, LOCALP, ORIGP, OUTD):
         print(f'Cannot write to the out directory. Check permissions: {e}')
         exit(0)
     except:
-        logging.debug(f'General error extractin file to path.')
+        logging.debug(f'General error extracting file to path.')
 
 # This might not be necessary if we can extract directly.                    
 def makeDirStructure(FP, OUTD): # FP is a string
@@ -95,8 +95,8 @@ def makeDirStructure(FP, OUTD): # FP is a string
         logging.debug(f'General error creating file path.')
 
 def windowsWarning():
-    print("Note: Windows does not accept POSIX characters.")
-    print("      Illegal chracters will be replaced with \"-\".")
+    print("Note: Windows paths are not POSIX compliant.")
+    print("      Illegal original-path chracters will be replaced with \"-\".")
 
 def main():
     args = setArgs()
