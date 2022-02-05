@@ -21,7 +21,7 @@ __author__ = 'Joshua James'
 __copyright__ = 'Copyright 2022, UFDR2DIR'
 __credits__ = []
 __license__ = 'MIT'
-__version__ = '0.1.5'
+__version__ = '0.1.6'
 __maintainer__ = 'Joshua James'
 __email__ = 'joshua+github@dfirscience.org'
 __status__ = 'active'
@@ -53,11 +53,8 @@ def getZipReportXML(ufdr, OUTD):
                     if result:
                         ORIGF = result.group(1)
                         if platform.system() == "Windows":
-                            illegal = ["<", ">", ":", "\"", "/", "\\", "|", "?", "*"]
-                            if any(x in ORIGF for x in illegal):
-                                logging.debug("Illegal character found in Windows file path... removing")
-                                # Strip unsupported chars
-                                ORIGF = result.group(1).strip("<>:\"/\|?*")
+                            #illegal = ["<", ">", ":", "\"", "/", "\\", "|", "?", "*"] <-- need to check for each
+                            ORIGF = result.group(1).strip(":")
                         logging.debug(f'Original: {ORIGF}')
                         # Create the original file directory structure
                         makeDirStructure(ORIGF, OUTD)
@@ -68,8 +65,10 @@ def getZipReportXML(ufdr, OUTD):
                         logging.debug(f'Local: {LOCALF}')
                         extractToDir(zip, LOCALF, ORIGF, OUTD)
 
-def extractToDir(zip, LOCALP, ORIGP, OUTD): 
-    OUTPATH = PurePath(Path(OUTD), Path(ORIGP[1:len(ORIGP)]).parent)
+def extractToDir(zip, LOCALP, ORIGP, OUTD):
+    if ORIGP[:1] == "/": # Sometimes the first slash is missing in report.xml
+        ORIGP = ORIGP[1:len(ORIGP)]
+    OUTPATH = PurePath(Path(OUTD), Path(ORIGP).parent)
     logging.debug(f'Extracting {LOCALP} to {OUTPATH}')
     try:
         zip.extract(LOCALP, OUTPATH)
@@ -80,7 +79,12 @@ def extractToDir(zip, LOCALP, ORIGP, OUTD):
 def makeDirStructure(FP, OUTD): # FP is a string
     OUTPATH = PurePath(Path(OUTD), Path(FP[1:len(FP)]).parent)
     logging.debug(f'Outpath set to: {OUTPATH}')
-    Path(OUTPATH).mkdir(parents=True, exist_ok=True)
+    try:
+        Path(OUTPATH).mkdir(parents=True, exist_ok=True)
+    except NotADirectoryError as e:
+        logging.debug(f'Error creating directory: {e}')
+    except:
+        logging.debug(f'General error creating file path.')
 
 def main():
     args = setArgs()
