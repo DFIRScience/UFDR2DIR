@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.2] - 2022-02-05
+### Changed
+- Changed zip file extraction bug in Windows
+- Temp remove specify output directory
+
 ## [0.1.1] - 2022-02-04
 ### Added
 - Original directory structure creation function

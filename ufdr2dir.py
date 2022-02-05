@@ -21,7 +21,7 @@ __author__ = 'Joshua James'
 __copyright__ = 'Copyright 2022, UFDR2DIR'
 __credits__ = []
 __license__ = 'MIT'
-__version__ = '0.1.1'
+__version__ = '0.1.2'
 __maintainer__ = 'Joshua James'
 __email__ = 'joshua+github@dfirscience.org'
 __status__ = 'active'
@@ -36,7 +36,7 @@ def setLogging(debug):
 def setArgs():
     parser = argparse.ArgumentParser(description=__copyright__)
     parser.add_argument('ufdr', help="Celebrite Reader UFDR file")
-    parser.add_argument('-o', '--out', required=False, action='store_true', help='Output directory path')
+    #parser.add_argument('--out', nargs=1, required=False, action='store', help='Output directory path')
     parser.add_argument('--debug', required=False, action='store_true', help='Set the log level to DEBUG')
     return(parser.parse_args())
 
@@ -46,7 +46,6 @@ def getZipReportXML(ufdr, OUTD):
     logging.info("Extracting report.xml...")
     with ZipFile(ufdr, 'r') as zip:
         with io.TextIOWrapper(zip.open("report.xml"), encoding="utf-8") as f:
-            #count = sum(1 for _ in f)
             logging.info("Creating original directory structure...")
             for l in alive_it(f): # Run though each line... is lxml faster?
                 if l.__contains__('<file fs'):
@@ -59,15 +58,13 @@ def getZipReportXML(ufdr, OUTD):
                 elif l.__contains__('name="Local Path"'):
                     result = re.search('CDATA\[(.*?)\]\]', l) # This gets local path / FN
                     if result:
-                        # ZipFile changes / or \ based on platform
-                        if platform.system() == "Windows": LOCALF = result.group(1)
-                        else: LOCALF = result.group(1).replace("\\", "/")
+                        LOCALF = result.group(1).replace("\\", "/")
                         logging.debug(f'Local: {LOCALF}')
                         extractToDir(zip, LOCALF, ORIGF, OUTD)
 
 def extractToDir(zip, LOCALP, ORIGP, OUTD): 
     OUTPATH = PurePath(Path(OUTD), Path(ORIGP[1:len(ORIGP)]).parent)
-    logging.debug(f'extracting {LOCALP} to {OUTPATH}')
+    logging.debug(f'Extracting {LOCALP} to {OUTPATH}')
     try:
         zip.extract(LOCALP, OUTPATH)
     except KeyError as e:
@@ -87,9 +84,9 @@ def main():
     print(f"{__software__} v{__version__}")
     if Path.is_file(UFDR):
         logging.debug(f'UDFR set to {args.ufdr}')
-    if args.out and Path.is_dir(Path(args.out)):
-        logging.debug(f'Output directory set to {args.out}')
-        OUTD = args.out + "UFDRConvert"
+    #if args.out and Path.is_dir(Path(args.out)):
+    #    logging.debug(f'Output directory set to {args.out}')
+    #    OUTD = args.out + "UFDRConvert"
     getZipReportXML(UFDR, OUTD)
 
 if __name__ == '__main__':
