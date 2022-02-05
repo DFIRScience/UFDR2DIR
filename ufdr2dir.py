@@ -8,7 +8,8 @@ MIT License.
 # Imports
 import argparse
 import logging
-import re, io
+import re, io, os
+import signal
 import platform
 
 from alive_progress import alive_it
@@ -21,7 +22,7 @@ __author__ = 'Joshua James'
 __copyright__ = 'Copyright 2022, UFDR2DIR'
 __credits__ = []
 __license__ = 'MIT'
-__version__ = '0.1.7'
+__version__ = '0.1.8'
 __maintainer__ = 'Joshua James'
 __email__ = 'joshua+github@dfirscience.org'
 __status__ = 'active'
@@ -90,7 +91,7 @@ def makeDirStructure(FP, OUTD): # FP is a string
         logging.debug(f'Error creating directory: {e}')
     except PermissionError as e:
         print(f'Cannot write to the out directory. Check permissions: {e}')
-        exit(0)
+        exit(1)
     except:
         logging.debug(f'General error creating file path.')
 
@@ -98,12 +99,18 @@ def windowsWarning():
     print("Note: Windows paths are not POSIX compliant.")
     print("      Illegal original-path chracters will be replaced with \"-\".")
 
+def exitHandler(sig, frame):
+    logging.info('Process terminated by user.')
+    if platform.system == "Windows": os._exit()
+    else: os.kill(os.getpid(), signal.SIGINT)
+
 def main():
+    signal.signal(signal.SIGINT, exitHandler)
     args = setArgs()
     UFDR = Path(args.ufdr)
     OUTD = Path.cwd().joinpath("UFDRConvert")
     setLogging(args.debug)
-    print(f"{__software__} v{__version__}")
+    print(f"{__software__} v{__version__} - Use ctrl+c to exit")
     if platform.system() == "Windows":
         windowsWarning()
     if Path.is_file(UFDR):
