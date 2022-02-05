@@ -21,7 +21,7 @@ __author__ = 'Joshua James'
 __copyright__ = 'Copyright 2022, UFDR2DIR'
 __credits__ = []
 __license__ = 'MIT'
-__version__ = '0.1.3'
+__version__ = '0.1.4'
 __maintainer__ = 'Joshua James'
 __email__ = 'joshua+github@dfirscience.org'
 __status__ = 'active'
@@ -36,7 +36,7 @@ def setLogging(debug):
 def setArgs():
     parser = argparse.ArgumentParser(description=__copyright__)
     parser.add_argument('ufdr', help="Celebrite Reader UFDR file")
-    #parser.add_argument('--out', nargs=1, required=False, action='store', help='Output directory path')
+    parser.add_argument('-o', '--out', required=False, action='store', dest="out", help='Output directory path')
     parser.add_argument('--debug', required=False, action='store_true', help='Set the log level to DEBUG')
     return(parser.parse_args())
 
@@ -52,7 +52,7 @@ def getZipReportXML(ufdr, OUTD):
                     result = re.search('path="(.*?)" ', l) # This gets original path / FN
                     if result:
                         ORIGF = result.group(1)
-                        if platform.system() is "Windows":
+                        if platform.system() == "Windows":
                             illegal = ["<", ">", ":", "\"", "/", "\\", "|", "?", "*"]
                             if any(x in ORIGF for x in illegal):
                                 logging.debug("Illegal character found in Windows file path... removing")
@@ -85,14 +85,13 @@ def makeDirStructure(FP, OUTD): # FP is a string
 def main():
     args = setArgs()
     UFDR = Path(args.ufdr)
-    OUTD = Path.cwd().joinpath("UFDRConvert")
     setLogging(args.debug)
     print(f"{__software__} v{__version__}")
     if Path.is_file(UFDR):
         logging.debug(f'UDFR set to {args.ufdr}')
-    #if args.out and Path.is_dir(Path(args.out)):
-    #    logging.debug(f'Output directory set to {args.out}')
-    #    OUTD = args.out + "UFDRConvert"
+    if args.out and Path.is_dir(Path(args.out)):
+        logging.debug(f'Output directory set to {args.out}')
+        OUTD = args.out + "UFDRConvert"
     getZipReportXML(UFDR, OUTD)
 
 if __name__ == '__main__':
