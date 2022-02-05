@@ -21,7 +21,7 @@ __author__ = 'Joshua James'
 __copyright__ = 'Copyright 2022, UFDR2DIR'
 __credits__ = []
 __license__ = 'MIT'
-__version__ = '0.1.4'
+__version__ = '0.1.5'
 __maintainer__ = 'Joshua James'
 __email__ = 'joshua+github@dfirscience.org'
 __status__ = 'active'
@@ -85,6 +85,7 @@ def makeDirStructure(FP, OUTD): # FP is a string
 def main():
     args = setArgs()
     UFDR = Path(args.ufdr)
+    OUTD = Path.cwd().joinpath("UFDRConvert")
     setLogging(args.debug)
     print(f"{__software__} v{__version__}")
     if Path.is_file(UFDR):
