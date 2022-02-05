@@ -6,6 +6,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.7] - 2022-02-05
+### Added
+- Notice of paths changes for Windows users
+- Check write permission error and exit
+- NotADirectoryError catch during extraction
+- general error catch during file extraction
+
+### Fixed
+- Windows illegal character better strip
+
 ## [0.1.6] - 2022-02-05
 ### Added
 - TryCatch for directory creation

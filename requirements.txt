@@ -1,1 +1,1 @@
-alive_progress
+alive_progress>=2.2.0

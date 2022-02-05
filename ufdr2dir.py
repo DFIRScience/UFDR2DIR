@@ -21,7 +21,7 @@ __author__ = 'Joshua James'
 __copyright__ = 'Copyright 2022, UFDR2DIR'
 __credits__ = []
 __license__ = 'MIT'
-__version__ = '0.1.6'
+__version__ = '0.1.7'
 __maintainer__ = 'Joshua James'
 __email__ = 'joshua+github@dfirscience.org'
 __status__ = 'active'
@@ -52,9 +52,7 @@ def getZipReportXML(ufdr, OUTD):
                     result = re.search('path="(.*?)" ', l) # This gets original path / FN
                     if result:
                         ORIGF = result.group(1)
-                        if platform.system() == "Windows":
-                            #illegal = ["<", ">", ":", "\"", "/", "\\", "|", "?", "*"] <-- need to check for each
-                            ORIGF = result.group(1).strip(":")
+                        if platform.system() == "Windows": ORIGF = re.sub('[:*?"<>|]', '-', ORIGF)
                         logging.debug(f'Original: {ORIGF}')
                         # Create the original file directory structure
                         makeDirStructure(ORIGF, OUTD)
@@ -74,6 +72,13 @@ def extractToDir(zip, LOCALP, ORIGP, OUTD):
         zip.extract(LOCALP, OUTPATH)
     except KeyError as e:
         logging.debug(e)
+    except NotADirectoryError as e:
+        logging.debug(f'Error writing to directory: {e}')
+    except PermissionError as e:
+        print(f'Cannot write to the out directory. Check permissions: {e}')
+        exit(0)
+    except:
+        logging.debug(f'General error extractin file to path.')
 
 # This might not be necessary if we can extract directly.                    
 def makeDirStructure(FP, OUTD): # FP is a string
@@ -83,8 +88,15 @@ def makeDirStructure(FP, OUTD): # FP is a string
         Path(OUTPATH).mkdir(parents=True, exist_ok=True)
     except NotADirectoryError as e:
         logging.debug(f'Error creating directory: {e}')
+    except PermissionError as e:
+        print(f'Cannot write to the out directory. Check permissions: {e}')
+        exit(0)
     except:
         logging.debug(f'General error creating file path.')
+
+def windowsWarning():
+    print("Note: Windows does not accept POSIX characters.")
+    print("      Illegal chracters will be replaced with \"-\".")
 
 def main():
     args = setArgs()
@@ -92,6 +104,8 @@ def main():
     OUTD = Path.cwd().joinpath("UFDRConvert")
     setLogging(args.debug)
     print(f"{__software__} v{__version__}")
+    if platform.system() == "Windows":
+        windowsWarning()
     if Path.is_file(UFDR):
         logging.debug(f'UDFR set to {args.ufdr}')
     if args.out and Path.is_dir(Path(args.out)):
