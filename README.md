@@ -30,7 +30,7 @@ Cellebrite apparently does some deleted data recovery. These files are currently
 
 Most UFDR are probably going to be from Android and iOS. Windows, however, has a lot of illegal file path characters. If you extract the UFDR on Windows/NTFS, illegal characters will be stripped from the file path. Be aware that some paths may be slightly different from original on Windows.
 
-**Example:** ```com.facebook.katana:dash``` <-- ":" is an illegal path character in NTFS (thanks, alternate data streams!). As such, UFDR2DIR extracts it as ```com.facebook.katanadash``` on Windows. Linux and MacOS are unaffected. 
+**Example:** ```com.facebook.katana:dash``` <-- ":" is an illegal path character in NTFS (thanks, alternate data streams!). As such, UFDR2DIR extracts it as ```com.facebook.katanadash``` on Windows. Linux and MacOS are unaffected.
 
 ## Bug reports and suggestions
 

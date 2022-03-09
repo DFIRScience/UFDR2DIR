@@ -12,7 +12,6 @@ import re, io, os
 import signal
 import platform
 
-from alive_progress import alive_it
 from pathlib import Path
 from pathlib import PurePath
 from zipfile import ZipFile
@@ -22,10 +21,18 @@ __author__ = 'Joshua James'
 __copyright__ = 'Copyright 2022, UFDR2DIR'
 __credits__ = []
 __license__ = 'MIT'
-__version__ = '0.1.8'
+__version__ = '0.1.9'
 __maintainer__ = 'Joshua James'
 __email__ = 'joshua+github@dfirscience.org'
 __status__ = 'active'
+
+PROGRESSLIB = True
+
+# Some users had trouble importing alive_progress on Windows
+try:from alive_progress import alive_it
+except ImportError:
+    print('[E] Could not find alive_progress library. Will not show progress.')
+    PROGRESSLIB = False
 
 # Set logging level and format
 def setLogging(debug):
@@ -42,27 +49,52 @@ def setArgs():
     return(parser.parse_args())
 
 def getZipReportXML(ufdr, OUTD):
-    ORIGF = ""
-    LOCALF = ""
     logging.info("Extracting report.xml...")
     with ZipFile(ufdr, 'r') as zip:
         with io.TextIOWrapper(zip.open("report.xml"), encoding="utf-8") as f:
             logging.info("Creating original directory structure...")
-            for l in alive_it(f): # Run though each line... is lxml faster?
-                if l.__contains__('<file fs'):
-                    result = re.search('path="(.*?)" ', l) # This gets original path / FN
-                    if result:
-                        ORIGF = result.group(1)
-                        if platform.system() == "Windows": ORIGF = re.sub('[:*?"<>|]', '-', ORIGF)
-                        logging.debug(f'Original: {ORIGF}')
-                        # Create the original file directory structure
-                        makeDirStructure(ORIGF, OUTD)
-                elif l.__contains__('name="Local Path"'):
-                    result = re.search('CDATA\[(.*?)\]\]', l) # This gets local path / FN
-                    if result:
-                        LOCALF = result.group(1).replace("\\", "/")
-                        logging.debug(f'Local: {LOCALF}')
-                        extractToDir(zip, LOCALF, ORIGF, OUTD)
+            if PROGRESSLIB: extractProgress(OUTD, f)
+            else: extractNoProgress(OUTD, f)
+
+# Function to show progress if lib exists
+# Optimize with progress functions instead of alive_it
+def extractProgress(OUTD, f):
+    ORIGF = ""
+    LOCALF = ""
+    for l in alive_it(f): # Run though each line... is lxml faster?
+        if l.__contains__('<file fs'):
+            result = re.search('path="(.*?)" ', l) # This gets original path / FN
+            if result:
+                ORIGF = result.group(1)
+                if platform.system() == "Windows": ORIGF = re.sub('[:*?"<>|]', '-', ORIGF)
+                logging.debug(f'Original: {ORIGF}')
+                # Create the original file directory structure
+                makeDirStructure(ORIGF, OUTD)
+        elif l.__contains__('name="Local Path"'):
+            result = re.search('CDATA\[(.*?)\]\]', l) # This gets local path / FN
+            if result:
+                LOCALF = result.group(1).replace("\\", "/")
+                logging.debug(f'Local: {LOCALF}')
+                extractToDir(zip, LOCALF, ORIGF, OUTD)
+
+def extractNoProgress(OUTD, f):
+    ORIGF = ""
+    LOCALF = ""
+    for l in f: # Run though each line... is lxml faster?
+        if l.__contains__('<file fs'):
+            result = re.search('path="(.*?)" ', l) # This gets original path / FN
+            if result:
+                ORIGF = result.group(1)
+                if platform.system() == "Windows": ORIGF = re.sub('[:*?"<>|]', '-', ORIGF)
+                logging.debug(f'Original: {ORIGF}')
+                # Create the original file directory structure
+                makeDirStructure(ORIGF, OUTD)
+        elif l.__contains__('name="Local Path"'):
+            result = re.search('CDATA\[(.*?)\]\]', l) # This gets local path / FN
+            if result:
+                LOCALF = result.group(1).replace("\\", "/")
+                logging.debug(f'Local: {LOCALF}')
+                extractToDir(zip, LOCALF, ORIGF, OUTD)
 
 def extractToDir(zip, LOCALP, ORIGP, OUTD):
     if ORIGP[:1] == "/": # Sometimes the first slash is missing in report.xml
