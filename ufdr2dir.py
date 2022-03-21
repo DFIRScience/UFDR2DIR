@@ -151,6 +151,7 @@ def windowsWarning():
 
 def exitHandler(sig, frame):
     logging.info('Process terminated by user.')
+    cleanWorking()
     if platform.system == "Windows": os._exit()
     else: os.kill(os.getpid(), signal.SIGINT)
 
