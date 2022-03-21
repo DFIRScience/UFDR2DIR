@@ -11,6 +11,7 @@ import logging
 import re, io, os
 import signal
 import platform
+import shutil
 
 from pathlib import Path
 from pathlib import PurePath
@@ -95,14 +96,16 @@ def extractNoProgress(zip, OUTD, f):
                 LOCALF = result.group(1).replace("\\", "/")
                 logging.debug(f'Local: {LOCALF}')
                 extractToDir(zip, LOCALF, ORIGF, OUTD)
+    Path('files').rename(f'{OUTD}/UFDR-Files') # Move remaining archive structure to output
 
 def extractToDir(zip, LOCALP, ORIGP, OUTD):
     if ORIGP[:1] == "/": # Sometimes the first slash is missing in report.xml
         ORIGP = ORIGP[1:len(ORIGP)]
-    OUTPATH = PurePath(Path(OUTD), Path(ORIGP).parent)
+    #OUTPATH = PurePath(Path(OUTD), Path(ORIGP).parent)
+    OUTPATH = PurePath(Path(OUTD), Path(ORIGP))
     logging.debug(f'Extracting {LOCALP} to {OUTPATH}')
     try:
-        zip.extract(LOCALP, OUTPATH)
+        zip.extract(LOCALP)
     except KeyError as e:
         logging.debug(e)
     except NotADirectoryError as e:
@@ -112,6 +115,19 @@ def extractToDir(zip, LOCALP, ORIGP, OUTD):
         exit(0)
     except:
         logging.debug(f'General error extracting file to path.')
+    else:
+        try:
+            Path(LOCALP).rename(OUTPATH) # Move from CWD to original path + FN
+        except IsADirectoryError: # If an archive is found but the dir already exists
+            logging.debug('An original archive was found. Renaming the directory...')
+            Path(OUTPATH).rename(f'{OUTPATH}.extract')
+            Path(LOCALP).rename(OUTPATH)
+        except NotADirectoryError: # If an archive file already exists and extraction is found
+            logging.debug('Archive extraction found but archive already exists. Skipping...')
+        except FileExistsError:
+            logging.debug('File already exists. Skipping...')
+        except OSError as e:
+            logging.debug(f'Error writing file: {e}') # Probably file name too long
 
 # This might not be necessary if we can extract directly.                    
 def makeDirStructure(FP, OUTD): # FP is a string
@@ -124,8 +140,10 @@ def makeDirStructure(FP, OUTD): # FP is a string
     except PermissionError as e:
         print(f'Cannot write to the out directory. Check permissions: {e}')
         exit(1)
-    except:
-        logging.debug(f'General error creating file path.')
+    except FileExistsError:
+        logging.debug(f"The file {OUTPATH} already exists. Skipping...")
+    #except:
+    #    logging.debug(f'General error creating file path.')
 
 def windowsWarning():
     print("Note: Windows paths are not POSIX compliant.")
@@ -135,6 +153,10 @@ def exitHandler(sig, frame):
     logging.info('Process terminated by user.')
     if platform.system == "Windows": os._exit()
     else: os.kill(os.getpid(), signal.SIGINT)
+
+def cleanWorking():
+    try: shutil.rmtree('files')
+    except: logging.debug('Files working directory not found')
 
 def main():
     signal.signal(signal.SIGINT, exitHandler)
@@ -150,6 +172,7 @@ def main():
     if args.out and Path.is_dir(Path(args.out)):
         logging.debug(f'Output directory set to {args.out}')
         OUTD = args.out + "UFDRConvert"
+    cleanWorking()
     getZipReportXML(UFDR, OUTD)
 
 if __name__ == '__main__':

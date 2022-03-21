@@ -28,6 +28,8 @@ The output directory will mirror what was recorded in ```report.xml```. You can 
 
 Cellebrite apparently does some deleted data recovery. These files are currently **not** being extracted if they lack path information.
 
+Physical Analyzer also extracts archive files. When recovering the structure we write the original archive file in the original path. Any extracted files are currently disregarded.
+
 Most UFDR are probably going to be from Android and iOS. Windows, however, has a lot of illegal file path characters. If you extract the UFDR on Windows/NTFS, illegal characters will be stripped from the file path. Be aware that some paths may be slightly different from original on Windows.
 
 **Example:** ```com.facebook.katana:dash``` <-- ":" is an illegal path character in NTFS (thanks, alternate data streams!). As such, UFDR2DIR extracts it as ```com.facebook.katanadash``` on Windows. Linux and MacOS are unaffected.
@@ -35,6 +37,17 @@ Most UFDR are probably going to be from Android and iOS. Windows, however, has a
 ## Bug reports and suggestions
 
 Pull requests considered! Otherwise create an issue or message me on [Twitter](https://twitter.com/dfirscience) if you find any bugs or have some recommendations.
+
+### TODO
+
+* Determine archive or archive extraction directory
+* Allow user to select keep or disregard extractions
+* UDFR2ZIP -> Create a directory structure in ZIP archive preserving meta-data
+* report.xml zip file name is based on read order -> fragile
+* Allow user to select file exists overwrite, skip or fail.
+* Optimize:
+  * Extract then copy is slow
+  * Read report.xml by line is slow
 
 ### Testing
 

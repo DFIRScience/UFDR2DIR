@@ -7,8 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ## [0.1.10] - 2022-03-21
+### Added
+- Additional checks for correct file name and paths
+
 ### Fixed
 - Missing zip folder arguments for extraction.
+- Output file name was based on local path and not original path
 
 ## [0.1.9] - 2022-03-09
 ### Fixed
