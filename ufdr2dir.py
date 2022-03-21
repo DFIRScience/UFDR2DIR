@@ -21,7 +21,7 @@ __author__ = 'Joshua James'
 __copyright__ = 'Copyright 2022, UFDR2DIR'
 __credits__ = []
 __license__ = 'MIT'
-__version__ = '0.1.9'
+__version__ = '0.1.10'
 __maintainer__ = 'Joshua James'
 __email__ = 'joshua+github@dfirscience.org'
 __status__ = 'active'
@@ -53,12 +53,12 @@ def getZipReportXML(ufdr, OUTD):
     with ZipFile(ufdr, 'r') as zip:
         with io.TextIOWrapper(zip.open("report.xml"), encoding="utf-8") as f:
             logging.info("Creating original directory structure...")
-            if PROGRESSLIB: extractProgress(OUTD, f)
-            else: extractNoProgress(OUTD, f)
+            if PROGRESSLIB: extractProgress(zip, OUTD, f)
+            else: extractNoProgress(zip, OUTD, f)
 
 # Function to show progress if lib exists
 # Optimize with progress functions instead of alive_it
-def extractProgress(OUTD, f):
+def extractProgress(zip, OUTD, f):
     ORIGF = ""
     LOCALF = ""
     for l in alive_it(f): # Run though each line... is lxml faster?
@@ -77,7 +77,7 @@ def extractProgress(OUTD, f):
                 logging.debug(f'Local: {LOCALF}')
                 extractToDir(zip, LOCALF, ORIGF, OUTD)
 
-def extractNoProgress(OUTD, f):
+def extractNoProgress(zip, OUTD, f):
     ORIGF = ""
     LOCALF = ""
     for l in f: # Run though each line... is lxml faster?

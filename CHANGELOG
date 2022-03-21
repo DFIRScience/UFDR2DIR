@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.10] - 2022-03-21
+### Fixed
+- Missing zip folder arguments for extraction.
+
 ## [0.1.9] - 2022-03-09
 ### Fixed
 - alive_progress failed import exits program.
